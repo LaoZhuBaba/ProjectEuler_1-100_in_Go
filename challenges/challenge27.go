@@ -14,9 +14,17 @@ func intInList(i int, l []int) bool {
 	return false
 }
 
+// func absInt(n int) int {
+// 	if n < 0 {
+// 		return -n
+// 	}
+// 	return n
+// }
+
 func Challenge27() {
 	c27Max := 0
 	for a := 0; a <= 1000; a++ {
+		//		if !isPrime(absInt(a)) {
 		if !isPrime(a) {
 			continue
 		}
@@ -36,7 +44,7 @@ func Challenge27() {
 				// fmt.Printf("For n=%d, a=%d, b=%d, x is: %d\n", n, a, b, result)
 				if len(list) > c27Max {
 					c27Max = len(list)
-					fmt.Printf("*****new max list is: %v when a is %d and b is %d with a product of %d\n", list, a, b, a*b)
+					fmt.Printf("max list is: %v when a is %d and b is %d with a product of %d and length %d\n", list, a, b, a*b, c27Max)
 				}
 			}
 		}

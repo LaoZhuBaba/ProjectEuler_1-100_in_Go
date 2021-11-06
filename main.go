@@ -31,6 +31,8 @@ func main() {
 	// challenges.Challenge24()
 	//challenges.Challenge25()
 	// challenges.Challenge26()
-	challenges.Challenge27()
+	// challenges.Challenge27()
+	// challenges.Challenge28()
+	challenges.Challenge29()
 	// challenges.Challenge67()
 }
