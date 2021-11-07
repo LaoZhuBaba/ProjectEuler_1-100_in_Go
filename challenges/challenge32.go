@@ -23,13 +23,6 @@ func containsDuplicates(s []int) bool {
 
 // func intToIntSlice(n int) []int is defined in challenge30.go
 
-// func intSliceToInt(s []int) int {
-// 	var ret int
-// 	for _, v := range s {
-// 		ret = ret*10 + v
-// 	}
-// 	return ret
-// }
 func intContainsDuplicateDigits(n int) bool {
 	return containsDuplicates(intToIntSlice(n))
 }
@@ -88,13 +81,9 @@ func Challenge32() {
 		}
 	}
 	fmt.Printf("%v\n", m)
-	// 	fmt.Printf("%v\n", intContainsDuplicateDigits(1234))
-	// 	fmt.Printf("%v\n", intContainsDuplicateDigits(1134))
-	// 	fmt.Printf("%v\n", intContainsDuplicateDigits(1233))
-	// 	fmt.Printf("%v\n", intContainsDuplicateDigits(4))
 	var solution int
 	for k := range m {
 		solution += k
 	}
-	fmt.Printf("%d\n", solution)
+	fmt.Printf("Solution is: %d\n", solution)
 }
