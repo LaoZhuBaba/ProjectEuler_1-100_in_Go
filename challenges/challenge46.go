@@ -17,7 +17,7 @@ import "fmt"
 
 const p46Max = 1_000_000
 
-var primes [p46Max]int
+var c50Primes [p46Max]int
 var dblSquares [p46Max]int
 var oddComposites [p46Max]int
 
@@ -30,7 +30,7 @@ func Challenge46() {
 	}
 	for n, i := 2, 0; i < p46Max; n++ {
 		if isPrime(n) {
-			primes[i] = n
+			c50Primes[i] = n
 			i++
 		}
 	}
