@@ -12,16 +12,7 @@ package challenges
 
 import "fmt"
 
-const c51NumerOfDigits = 8
-
-func intToRuneSlice(n int) []rune {
-
-	s := make([]rune, 0)
-	for _, r := range fmt.Sprintf("%d", n) {
-		s = append(s, r)
-	}
-	return s
-}
+const c51NumerOfDigits = 6
 
 func getDigitNumberRange(n int) (int, int) {
 	ret := 1
@@ -31,75 +22,53 @@ func getDigitNumberRange(n int) (int, int) {
 	return ret, (ret*10 - 1)
 }
 
-func maskSlice(s []rune, mask string) string {
-	ret := ""
-	var foundChar rune
-
-	for count, eachChar := range mask {
-		if eachChar == 'n' {
-			if foundChar == 0 {
-				foundChar = s[count]
-				continue
-			}
-			if s[count] == foundChar {
-				continue
-			} else {
-				return ""
-			}
-		}
-	}
-	for i := 0; i < len(s)-1; i++ {
-		if mask[i] == 'y' {
-			ret += string(s[i])
+func replaceDigit(s []int, n, replace int) (bool, []int) {
+	ret := make([]int, len(s))
+	tf := false
+	for k, v := range s {
+		if v == n {
+			ret[k] = replace
+			tf = true
 		} else {
-			ret += "."
+			ret[k] = v
 		}
 	}
-	return ret
+	return tf, ret
 }
 
-func getPermutations(n int) []string {
-	var ret = make([]string, 0)
-	if n == 2 {
-		return []string{"yy", "ny"}
-	}
-	for _, v := range getPermutations(n - 1) {
-		ret = append(ret, "y"+v)
-		ret = append(ret, "n"+v)
-	}
-	return ret
-}
 func Challenge51() {
-	// fmt.Printf("%v\n", intToRuneSlice(1234))
 	s, e := getDigitNumberRange(c51NumerOfDigits)
-	var primeSlice = make([][]rune, 0)
 	for count := s; count <= e; count++ {
-		if isPrime(count) {
-			primeSlice = append(primeSlice, intToRuneSlice(count))
+		if !isPrime(count) {
+			continue
 		}
-	}
-	m := make(map[string][]rune)
-	// We need to skip the first permutation because it is an empty mask (i.e., all y's)
-	perms := getPermutations(c51NumerOfDigits)
-	perms = perms[1:]
-	for _, perm := range perms {
-		fmt.Printf("perm is: %v\n", perm)
-		for _, s := range primeSlice {
-			key := maskSlice(s, perm)
-			//fmt.Printf("key: %v\n", key)
-			if key != "" {
-				m[key] = append(m[key], s...)
-			}
-		}
-		var maxLen int
-		var maxKey string
-		for k, v := range m {
-			if len(v) > maxLen {
-				maxLen = len(v)
-				maxKey = k
-			}
-		}
-		fmt.Printf("Longest: %c %v %d\n", m[maxKey], maxKey, maxLen)
-	}
+		primeList := intToIntSlice(count)
+		var replacementList []int
+		var changed bool
+		for _, digit := range [10]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9} {
+			primeCount := 1 // Start at one because the original number is a prime
+			notPrimeCount := 0
+			for _, replacementDigit := range [10]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9} {
+				if digit != replacementDigit {
+					changed, replacementList = replaceDigit(primeList, digit, replacementDigit)
+					if changed {
+						i := intSliceToInt(replacementList)
+						if isPrime(i) && i > s {
+							primeCount++
+						} else {
+							notPrimeCount++
+						}
+					}
+				}
+				if notPrimeCount > 2 {
+					break
+				}
+				if primeCount >= 8 {
+					fmt.Printf("Solution is %d\n", intSliceToInt(primeList))
+					return
+				}
 
+			}
+		}
+	}
 }
