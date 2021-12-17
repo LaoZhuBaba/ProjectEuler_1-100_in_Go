@@ -5,39 +5,30 @@ import "fmt"
 func Challenge58() {
 
 	list := []int{1}
-	var i int
-	primeMap := make(map[int]bool)
-	for count := 3; count < 1_000_000; count += 2 {
+	var tmp, count, countPrimes, pc int
+	for count = 3; pc != 9; count += 2 {
 		cxc := count * count
-		i = cxc - 3*(count-1)
-		list = append(list, i)
-		primeMap[i] = isPrime(i)
-		i = cxc - 2*(count-1)
-		list = append(list, i)
-		primeMap[i] = isPrime(i)
-		i = cxc - 1*(count-1)
-		list = append(list, i)
-		primeMap[i] = isPrime(i)
-		i = cxc
-		list = append(list, i)
-		primeMap[i] = isPrime(i)
-		var countPrime int
-		for _, n := range list {
-			if primeMap[n] {
-				// fmt.Printf("%d is prime\n", n)
-				countPrime++
-			}
-
+		tmp = cxc - 3*(count-1)
+		list = append(list, tmp)
+		if isPrime(tmp) {
+			countPrimes++
 		}
-		// fmt.Printf("countPrime is: %d\n", countPrime)
-		// fmt.Printf("len(list) is: %d\n", len(list))
-		pc := 100 * countPrime / len(list)
-		//fmt.Printf("For count %d, %d%% are prime\n", count, pc)
-		if pc < 10 {
-			fmt.Printf("solution: %d\n", count)
-			break
+		tmp = cxc - 2*(count-1)
+		list = append(list, tmp)
+		if isPrime(tmp) {
+			countPrimes++
 		}
-
+		tmp = cxc - 1*(count-1)
+		list = append(list, tmp)
+		if isPrime(tmp) {
+			countPrimes++
+		}
+		tmp = cxc
+		list = append(list, tmp)
+		if isPrime(tmp) {
+			countPrimes++
+		}
+		pc = 100 * countPrimes / len(list)
 	}
-	//fmt.Printf("%v\n", list)
+	fmt.Printf("solution: %d\n", count)
 }
