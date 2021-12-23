@@ -54,7 +54,9 @@ func Challenge59() {
 		containsAnd := false
 		containsThe := false
 		containsFor := false
+		total := 0
 		for k, v := range unencBuffer {
+			total += v
 			if v == 'a' && unencBuffer[k+1] == 'n' && unencBuffer[k+2] == 'd' {
 				containsAnd = true
 			}
@@ -70,6 +72,7 @@ func Challenge59() {
 			for _, v := range unencBuffer {
 				fmt.Printf("%c", v)
 			}
+			fmt.Printf("\nTotal: %d\n", total)
 		}
 	}
 }
