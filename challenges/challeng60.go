@@ -2,10 +2,6 @@ package challenges
 
 import "fmt"
 
-func gt(i1, i2 int) bool {
-	return i1 > i2
-}
-
 func generatePrimes(total int, pSlice *[]int) {
 	for count, n := 0, 2; count < total; n++ {
 		if isPrime(n) {
@@ -36,8 +32,6 @@ func testCombinations(s []int, i int, f func(int, int) bool) bool {
 const numPrimes = 1300
 
 func Challenge60() {
-
-	//	fmt.Printf("%v\n", testCombinations([]int{3, 7, 109}, 673, areConcatsPrime))
 
 	s := make([]int, 0, numPrimes)
 	generatePrimes(numPrimes, &s)
