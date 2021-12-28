@@ -2,7 +2,7 @@ package challenges
 
 import "fmt"
 
-func createSuperList(included, excluded []*[]int) []*[]int {
+func createPtrList(included, excluded []*[]int) []*[]int {
 	returnList := make([]*[]int, 0)
 	var skip bool
 	for _, i := range included {
@@ -31,6 +31,7 @@ func pentagon(i int) int {
 
 	return i * (3*i - 1) / 2
 }
+
 func hexagon(i int) int {
 
 	return i * (2*i - 1)
@@ -44,24 +45,60 @@ func octagon(i int) int {
 	return i * (3*i - 2)
 }
 
+// An example of a match is be 1234 & 3456
 func checkMiddleOverlap(i1, i2 int) bool {
 	return (i1-(i2/100))%100 == 0
 }
+
+// An example of a match is 1234 & 5612
 func checkOuterOverlap(i1, i2 int) bool {
 	return (i2-(i1/100))%100 == 0
 }
 func makePolygonalList(floor, ceiling int, f func(int) int) []int {
-	squareList := make([]int, 0)
+	l := make([]int, 0)
 	for count := 1; ; count++ {
 		transformed := f(count)
 		if transformed < floor {
 			continue
 		}
 		if transformed > ceiling {
-			return squareList
+			return l
 		}
-		squareList = append(squareList, transformed)
+		l = append(l, transformed)
 	}
+}
+
+func linkTogether(include, exclude []*[]int, chain []int) bool {
+	ptrList := createPtrList(include, exclude)
+	if len(ptrList) > 0 {
+		for _, p := range ptrList {
+			for _, v := range *p {
+				// Check to see if first two digits of v match the last two digits of the last integer
+				// in the chain
+				if checkMiddleOverlap(chain[len(chain)-1], v) {
+					// Call this function recursively with p added to the exclude list to ensure each type
+					// of number is only considered once.
+					if linkTogether(include, append(exclude, p), append(chain, v)) {
+						return true
+					}
+				}
+			}
+		}
+	} else {
+		// This is the case where we've linked together one of each type of number so we now have
+		// to check if the first two digits of the first integer in the chain match the last two digits
+		// in the last integer in the change.  If they do, then print the solution and then return
+		// 'true' which will cause all nested instances of this function to return true in sequence.
+		if checkOuterOverlap(chain[0], chain[len(chain)-1]) {
+			var solution int
+			for _, v := range chain {
+				solution += v
+			}
+			fmt.Printf("Completed the change: %v with total of %d\n", chain, solution)
+			return true
+		}
+	}
+	return false
 }
 
 func Challenge61() {
@@ -72,63 +109,15 @@ func Challenge61() {
 	heptagonList := makePolygonalList(1000, 9999, heptagon)
 	octagonList := makePolygonalList(1000, 9999, octagon)
 
-	for _, v1 := range triangleList {
-		bigList := []*[]int{&triangleList, &squareList, &pentagonList, &hexagonList, &heptagonList, &octagonList}
-		excludeList := []*[]int{&triangleList}
-		//
-		for _, p1 := range createSuperList(bigList, excludeList) {
-			for _, v2 := range *p1 {
-				if checkMiddleOverlap(v1, v2) {
-					// fmt.Printf("v1, v2: %d %d\n", v1, v2)
-					excludeList = append(excludeList, p1)
-					//
-					for _, p2 := range createSuperList(bigList, excludeList) {
-						for _, v3 := range *p2 {
-							if checkMiddleOverlap(v2, v3) {
-								// fmt.Printf("v1, v2, v3: %d %d %d\n", v1, v2, v3)
-								excludeList = append(excludeList, p2)
-								//
-								for _, p3 := range createSuperList(bigList, excludeList) {
-									for _, v4 := range *p3 {
-										if checkMiddleOverlap(v3, v4) {
-											// fmt.Printf("v1, v2, v3, v4: %d %d %d %d\n", v1, v2, v3, v4)
-											excludeList = append(excludeList, p3)
-											//
-											for _, p4 := range createSuperList(bigList, excludeList) {
-												for _, v5 := range *p4 {
-													if checkMiddleOverlap(v4, v5) {
-														// fmt.Printf("v1, v2, v3, v4, v5: %d %d %d %d %d\n", v1, v2, v3, v4, v5)
-														excludeList = append(excludeList, p4)
-														//
-														for _, p5 := range createSuperList(bigList, excludeList) {
-															for _, v6 := range *p5 {
-																if checkMiddleOverlap(v5, v6) {
-																	// fmt.Printf("v1, v2, v3, v4, v5, v6: %d %d %d %d %d %d\n", v1, v2, v3, v4, v5, v6)
-																	excludeList = append(excludeList, p5)
-																	//
-																	if checkOuterOverlap(v1, v6) {
-																		fmt.Printf("solution: %d\n", v1+v2+v3+v4+v5+v6)
-																		return
-																	}
-																	excludeList = excludeList[:len(excludeList)-1]
-																}
-															}
-														}
-														excludeList = excludeList[:len(excludeList)-1]
-													}
-												}
-											}
-											excludeList = excludeList[:len(excludeList)-1]
-										}
-									}
-								}
-								excludeList = excludeList[:len(excludeList)-1]
-							}
-						}
-					}
-					excludeList = excludeList[:len(excludeList)-1]
-				}
-			}
+	// triangleList doesn't go into the list of pointers to lists because we use triangleList as our
+	// starting point.  We have no matches to compare at this point so we need to consider every
+	// triangular number as a potential solution.  We could have started with any of the other pointers,
+	// but just happened to choose triangleList as the starting point.
+	bigList := []*[]int{&squareList, &pentagonList, &hexagonList, &heptagonList, &octagonList}
+	excludeList := []*[]int{}
+	for _, v := range triangleList {
+		if linkTogether(bigList, excludeList, []int{v}) {
+			return
 		}
 	}
 }
