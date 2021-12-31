@@ -11,6 +11,17 @@ func IntToIntSlice(n int) []int {
 	}
 	return slice
 }
+
+func Uint64ToUint64Slice(n uint64) []uint64 {
+	slice := make([]uint64, 0)
+
+	for n != 0 {
+		slice = append([]uint64{n % 10}, slice...)
+		n = n / 10
+	}
+	return slice
+}
+
 func IntSliceToInt(s []int) int {
 	var ret int
 	for _, v := range s {

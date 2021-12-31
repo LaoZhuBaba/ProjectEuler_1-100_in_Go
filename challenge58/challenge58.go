@@ -1,8 +1,8 @@
 package challenge58
 
 import (
+	"euler/shared"
 	"fmt"
-	"shared"
 )
 
 func Challenge58() {

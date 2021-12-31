@@ -1,8 +1,8 @@
 package challenge60
 
 import (
+	"euler/shared"
 	"fmt"
-	"shared"
 )
 
 func generatePrimes(total int, pSlice *[]int) {

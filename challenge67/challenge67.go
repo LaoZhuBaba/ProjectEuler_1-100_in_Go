@@ -1,4 +1,4 @@
-package challenges
+package challenge67
 
 import (
 	"bufio"
@@ -118,5 +118,5 @@ func Challenge67() {
 	grandTotal := descendTree(&tree, 0)
 	fmt.Printf("Optimal path is:\n")
 	printOptPath(&tree, 0, 1)
-	fmt.Printf("=======\n%d\n", grandTotal)
+	fmt.Printf("=======\n%d (Challenge 67 solution)\n", grandTotal)
 }
