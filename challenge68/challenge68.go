@@ -3,7 +3,7 @@
 // one at a time.  A bit like using "yield" in Python.  This means that the solution is
 // really unintelligent in some respects because we look at the every possible combination
 // of values in a set, but in reality, many of them could be excluded without any deep
-// consideration.  I eventually found quite a long list of possible answers and then had
+// consideration.  I eventually found quite a long list of potential answers and then had
 // to go back and read the question carefully to work out which ones could be excluded.
 // For example, it is pretty obvious from the question that the first digit in the solution
 // must be 6.  Another point is that I effectively found each solution several times, with
@@ -74,7 +74,7 @@ type IntCombinator struct {
 	ch chan bool
 }
 
-// IntCombinator represents a slice of integers.  It's purpose is to provide
+// IntCombinator represents a slice of integers.  Its purpose is to provide
 // all possible combinations of those integers.
 func newIntCombinator(s []int) *IntCombinator {
 	ic := new(IntCombinator)
