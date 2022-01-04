@@ -1,3 +1,14 @@
+// For this challenge I wanted to play with channels and the idea that a function could
+// be called once and then return each member of a the required result set via a channel--
+// one at a time.  A bit like using "yield" in Python.  This means that the solution is
+// really unintelligent in some respects because we look at the every possible combination
+// of values in a set, but in reality, many of them could be excluded without any deep
+// consideration.  I eventually found quite a long list of possible answers and then had
+// to go back and read the question carefully to work out which ones could be excluded.
+// For example, it is pretty obvious from the question that the first digit in the solution
+// must be 6.  Another point is that I effectively found each solution several times, with
+// only a difference in ordering.
+
 package challenge68
 
 import (
@@ -95,32 +106,47 @@ func Challenge68() {
 	go ic.RunCombinations()
 
 	var seq [15]int
+	var sum, solution int
 	for v := range ic.ch {
 		if v {
 			// fmt.Printf("%v %v\n", v, ic.s)
 			for k, n := range mpr.sequence {
 				seq[k] = mpr.values[ic.s[n]]
 			}
-			//			fmt.Printf("sequence: %v\n", seq)
-			if sumThree(seq[0:3]) == sumThree(seq[3:6]) &&
-				sumThree(seq[3:6]) == sumThree(seq[6:9]) &&
-				sumThree(seq[6:9]) == sumThree(seq[9:12]) &&
-				sumThree(seq[9:12]) == sumThree(seq[12:15]) {
-				// i := shared.IntSliceToInt(seq[:])
-				// if len(fmt.Sprintf("%d", i)) != 16 {
-				// 	fmt.Printf("Too long\n")
-				// }
-				// fmt.Printf("BINGO %v\n", seq)
-				str := ""
-				for _, v := range seq {
-					str = (str + fmt.Sprintf("%d", v))
-				}
-				if len(str) == 16 {
-					fmt.Printf("%s\n", str)
+			// See initial notes above.  The correct answer has to begin with 6 because the question
+			// makes clear that the inner "pentagon" is made of the numbers 1-5 and the instructionss
+			// state: "starting from ... the numerically lowest external node" which only mean 6.  Abd
+			// this means that the second and third values must be less than 6 because because each
+			// group of three values must start with a value from the outer pentagon and continue with
+			// two values from the inner pentagon.
+			if seq[0] == 6 && seq[1] < 6 && seq[2] < 6 {
+
+				//			fmt.Printf("sequence: %v\n", seq)
+				if sumThree(seq[0:3]) == sumThree(seq[3:6]) &&
+					sumThree(seq[3:6]) == sumThree(seq[6:9]) &&
+					sumThree(seq[6:9]) == sumThree(seq[9:12]) &&
+					sumThree(seq[9:12]) == sumThree(seq[12:15]) {
+					// i := shared.IntSliceToInt(seq[:])
+					// if len(fmt.Sprintf("%d", i)) != 16 {
+					// 	fmt.Printf("Too long\n")
+					// }
+					// fmt.Printf("BINGO %v\n", seq)
+					str := ""
+					for _, v := range seq {
+						str = (str + fmt.Sprintf("%d", v))
+					}
+					if len(str) == 16 {
+						fmt.Sscanf(str, "%d", &sum)
+						if sum > solution {
+							solution = sum
+						}
+						// fmt.Printf("%s\n", str)
+					}
 				}
 			}
 			ic.ch <- true
 		} else {
+			fmt.Printf("solution 68 is: %d\n", solution)
 			return
 		}
 	}
