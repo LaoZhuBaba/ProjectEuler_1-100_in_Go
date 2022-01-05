@@ -22,3 +22,19 @@ func IsPrime(n int) bool {
 		return false
 	}
 }
+
+func GetPrimeFactors(n int) []int {
+	if n < 2 {
+		return []int{1}
+	}
+	factors := make([]int, 0)
+	var i int
+	for i = 2; i < (int(math.Sqrt(float64(n))) + 1); i++ {
+		if n%i == 0 {
+			factors = append(factors, i)
+			n /= i
+			i--
+		}
+	}
+	return append(factors, n)
+}
