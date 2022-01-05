@@ -66,12 +66,13 @@ func runCombinations(p []int, ch chan bool) {
 // caller.
 func (ic IntCombinator) RunCombinations() {
 	runCombinations(ic.s, ic.ch)
-	ic.ch <- false
+	ic.done()
 }
 
 type IntCombinator struct {
-	s  []int
-	ch chan bool
+	s    []int
+	ch   chan bool
+	done func()
 }
 
 // IntCombinator represents a slice of integers.  Its purpose is to provide
@@ -80,6 +81,9 @@ func newIntCombinator(s []int) *IntCombinator {
 	ic := new(IntCombinator)
 	ic.ch = make(chan bool)
 	ic.s = make([]int, len(s))
+	ic.done = func() {
+		close(ic.ch)
+	}
 	copy(ic.s, s)
 	return ic
 }
@@ -145,9 +149,7 @@ func Challenge68() {
 				}
 			}
 			ic.ch <- true
-		} else {
-			fmt.Printf("solution 68 is: %d\n", solution)
-			return
 		}
 	}
+	fmt.Printf("solution 68 is: %d\n", solution)
 }
