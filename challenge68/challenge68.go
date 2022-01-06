@@ -35,38 +35,56 @@ func getNextHigherInList(n int, l []int) int {
 	}
 	return minHigherThan
 }
-func runCombinations(p []int, ch chan bool) {
-	if len(p) == 2 {
-		ch <- true
-		<-ch
-		p[0], p[1] = p[1], p[0]
-		ch <- true
-		<-ch
-		return
-	}
-	var nextHigher int
-	for {
-		runCombinations(p[1:], ch)
-		if getMaxInList(p) == p[0] {
-			break
-		} else {
-			nextHigher = getNextHigherInList(p[0], p[1:])
-			for nextHigher != p[0] {
-				shared.RotateRight(p)
-			}
-			sort.Ints(p[1:])
-		}
-	}
-}
 
-// Return every possibly combination the slice of integers in ic.s.
-// This slice is repeatedly updated and after update "true" will be
-// sent so the caller knows to read the updated value.  After all
-// possible combinations have been provide send "false" to the.
-// caller.
+// Return every possible combination of the slice of integers in ic.s. This slice is
+// repeatedly updated and after update "true" will be sent so the caller knows to read
+// the updated value.  After all possible combinations have been provided signal
+// completion with ic,done()
 func (ic IntCombinator) RunCombinations() {
-	runCombinations(ic.s, ic.ch)
-	ic.done()
+	var i, nextHigher int
+	defer ic.done()
+	// This was originally implemented with recursion but this created undesireable
+	// complications.  Reimplemented later with i representing what was originally
+	// the depth of recursion.
+	for {
+		sl := ic.s[i:]
+		// If sl has only two elements then just reverse them.
+		if len(sl) == 2 {
+			ic.ch <- true
+			<-ic.ch
+			sl[0], sl[1] = sl[1], sl[0]
+			ic.ch <- true
+			<-ic.ch
+			i--
+			continue
+		}
+		// Keep moving i to the right if the original small-to-big order
+		// has not been reversed.
+		if sl[2] > sl[1] {
+			i++
+			continue
+		}
+		if getMaxInList(sl) == sl[0] {
+			// Out ultimate aim is for the order of integers to be completely reversed,
+			// with sl[0] being the highest numbered element.  If this condition is met
+			// when i == 0 then we're done.  If this condition is met when i > 0 then
+			// decrement i and continue.
+			if i == 0 {
+				return
+			}
+			i--
+			continue
+		}
+		// If i != 2 AND sl[0] is not yet at max value and sl[2] is NOT > sl[1] then rotate
+		// the slice until the next higher value is at sl[0] and then sort the other values
+		// from lowest to highest.
+		nextHigher = getNextHigherInList(sl[0], sl[1:])
+		for nextHigher != sl[0] {
+			shared.RotateRight(sl)
+		}
+		sort.Ints(sl[1:])
+		i++
+	}
 }
 
 type IntCombinator struct {
@@ -75,8 +93,9 @@ type IntCombinator struct {
 	done func()
 }
 
-// IntCombinator represents a slice of integers.  Its purpose is to provide
-// all possible combinations of those integers.
+// IntCombinator represents a slice of integers which is sorted from low to high. Its purpose is to
+// provide all possible combinations of those integers.  At the end of the process the slice will be
+// ordered from high to low.
 func newIntCombinator(s []int) *IntCombinator {
 	ic := new(IntCombinator)
 	ic.ch = make(chan bool)
@@ -84,7 +103,10 @@ func newIntCombinator(s []int) *IntCombinator {
 	ic.done = func() {
 		close(ic.ch)
 	}
+	// We could also do ic.s = s rather then copying, but the caller may not expect s to be updated
+	// so safest to copy I think.
 	copy(ic.s, s)
+	sort.Ints(ic.s)
 	return ic
 }
 
@@ -99,11 +121,16 @@ func NewMagicPentagonRing(values [10]int) *magicPentagonRing {
 	mpr.sequence = [15]int{5, 0, 1, 6, 1, 2, 7, 2, 3, 8, 3, 4, 9, 4, 0}
 	return mpr
 }
-func sumThree(a []int) int {
-	return a[0] + a[1] + a[2]
+
+func sumInt(s ...int) (i int) {
+	for _, v := range s {
+		i += v
+	}
+	return
 }
 func Challenge68() {
 	ic := newIntCombinator([]int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9})
+	// ic := newIntCombinator([]int{0, 1, 2, 3})
 	// var s = []int{0, 1, 2, 3, 4, 5, 6, 7, 8, 9}
 	// var s = []int{0, 1, 2, 3, 4, 5, 6}
 	mpr := NewMagicPentagonRing([10]int{1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
@@ -111,45 +138,37 @@ func Challenge68() {
 
 	var seq [15]int
 	var sum, solution int
-	for v := range ic.ch {
-		if v {
-			// fmt.Printf("%v %v\n", v, ic.s)
-			for k, n := range mpr.sequence {
-				seq[k] = mpr.values[ic.s[n]]
-			}
-			// See initial notes above.  The correct answer has to begin with 6 because the question
-			// makes clear that the inner "pentagon" is made of the numbers 1-5 and the instructionss
-			// state: "starting from ... the numerically lowest external node" which only mean 6.  Abd
-			// this means that the second and third values must be less than 6 because because each
-			// group of three values must start with a value from the outer pentagon and continue with
-			// two values from the inner pentagon.
-			if seq[0] == 6 && seq[1] < 6 && seq[2] < 6 {
+	for <-ic.ch {
+		for k, n := range mpr.sequence {
+			seq[k] = mpr.values[ic.s[n]]
+		}
+		// See initial notes above.  The correct answer has to begin with 6 because the question
+		// makes clear that the inner "pentagon" is made of the numbers 1-5 and the instructionss
+		// state: "starting from ... the numerically lowest external node" which only mean 6.  Abd
+		// this means that the second and third values must be less than 6 because because each
+		// group of three values must start with a value from the outer pentagon and continue with
+		// two values from the inner pentagon.
+		if seq[0] == 6 && seq[1] < 6 && seq[2] < 6 {
 
-				//			fmt.Printf("sequence: %v\n", seq)
-				if sumThree(seq[0:3]) == sumThree(seq[3:6]) &&
-					sumThree(seq[3:6]) == sumThree(seq[6:9]) &&
-					sumThree(seq[6:9]) == sumThree(seq[9:12]) &&
-					sumThree(seq[9:12]) == sumThree(seq[12:15]) {
-					// i := shared.IntSliceToInt(seq[:])
-					// if len(fmt.Sprintf("%d", i)) != 16 {
-					// 	fmt.Printf("Too long\n")
-					// }
-					// fmt.Printf("BINGO %v\n", seq)
-					str := ""
-					for _, v := range seq {
-						str = (str + fmt.Sprintf("%d", v))
-					}
-					if len(str) == 16 {
-						fmt.Sscanf(str, "%d", &sum)
-						if sum > solution {
-							solution = sum
-						}
-						// fmt.Printf("%s\n", str)
+			//			fmt.Printf("sequence: %v\n", seq)
+			if sumInt(seq[0:3]...) == sumInt(seq[3:6]...) &&
+				sumInt(seq[3:6]...) == sumInt(seq[6:9]...) &&
+				sumInt(seq[6:9]...) == sumInt(seq[9:12]...) &&
+				sumInt(seq[9:12]...) == sumInt(seq[12:15]...) {
+				str := ""
+				for _, v := range seq {
+					str = (str + fmt.Sprintf("%d", v))
+				}
+				if len(str) == 16 {
+					fmt.Sscanf(str, "%d", &sum)
+					if sum > solution {
+						solution = sum
 					}
 				}
 			}
-			ic.ch <- true
 		}
+		// Acknowledge receipt of message, so ic.RunCombinations() can continue
+		ic.ch <- true
 	}
 	fmt.Printf("solution 68 is: %d\n", solution)
 }
