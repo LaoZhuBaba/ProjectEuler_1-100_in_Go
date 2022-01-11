@@ -85,3 +85,15 @@ func SumOfList(l *[]int) int {
 	}
 	return sum
 }
+
+func SizeOfIntersection(s1, s2 []int) int {
+	var count int
+	for _, v1 := range s1 {
+		for _, v2 := range s2 {
+			if v1 == v2 {
+				count++
+			}
+		}
+	}
+	return count
+}
