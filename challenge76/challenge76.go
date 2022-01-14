@@ -5,7 +5,9 @@ import (
 )
 
 // The following code works and generates all possible combinations for up to about 30 but
-// after that the calculation time became ridiculously long.
+// after that the calculation time became ridiculously long.  So unsuitable to use, but
+// but still quite cool.
+//
 // func allAddends(i int) [][]int {
 // 	s := make([][]int, 0)
 // 	if i == 2 {
@@ -32,12 +34,16 @@ const max = 100
 func pentGen() func() int {
 	n := 1
 	return func() int {
-		ret := n * (3*n - 1) / 2
-		if n < 0 {
-			n--
-		}
-		n *= -1
-		return ret
+		// Using defer means that although n will evaluated before the return statement but the
+		// value of n will not change until after the return value has been calculated.  Avoids
+		// the need for a temporary variable to store the return value.
+		defer func() {
+			if n < 0 {
+				n--
+			}
+			n *= -1
+		}()
+		return n * (3*n - 1) / 2
 	}
 }
 
