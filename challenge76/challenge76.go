@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// The following code to work and generate all possible combinations for up to about 30 but
+// The following code works and generates all possible combinations for up to about 30 but
 // after that the calculation time became ridiculously long.
 // func allAddends(i int) [][]int {
 // 	s := make([][]int, 0)
