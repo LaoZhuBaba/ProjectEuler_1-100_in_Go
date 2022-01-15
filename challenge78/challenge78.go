@@ -1,36 +1,13 @@
-package challenge76
+package challenge78
 
 import (
 	"euler/shared"
 	"fmt"
 )
 
-// The following code works and generates all possible combinations for up to about 30 but
-// after that the calculation time became ridiculously long.  So unsuitable to use, but
-// but still quite cool.
-//
-// func allAddends(i int) [][]int {
-// 	s := make([][]int, 0)
-// 	if i == 2 {
-// 		return [][]int{{1, 1}}
-// 	}
-// 	for x := 1; x <= i/2; x++ {
-// 		y := i - x
-// 		s = append(s, []int{x, y})
-// 		for _, v := range allAddends(y) {
-// 			suffix := append([]int{x}, v...)
-// 			if !sort.IntsAreSorted(suffix) {
-// 				continue
-// 			}
-// 			s = append(s, suffix)
-// 		}
-// 	}
-// 	return s
-// }
+const max = 100_000
 
-const max = 100
-
-func Challenge76() {
+func Challenge78() {
 	// The first two values are just "given"
 	array := [max + 1]int{1, 1}
 
@@ -56,6 +33,10 @@ func Challenge76() {
 			}
 			toggle++
 		}
+		array[index] %= 1_000_000
+		if array[index]%1_000_000 == 0 {
+			fmt.Printf("Challenge 78 solution is: %d\n", index)
+			return
+		}
 	}
-	fmt.Printf("%d\n", array[max]-1)
 }
