@@ -6,6 +6,8 @@ import (
 )
 
 const (
+	// It's a bit dumb to use a fix sized array here but I reused code and
+	// didn't bother to change to use a slice.  100_000 seems to be big enough.
 	arraySize = 100_000
 	target    = 1_000_000
 )
