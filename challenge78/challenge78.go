@@ -5,13 +5,16 @@ import (
 	"fmt"
 )
 
-const max = 100_000
+const (
+	arraySize = 100_000
+	target    = 1_000_000
+)
 
 func Challenge78() {
 	// The first two values are just "given"
-	array := [max + 1]int{1, 1}
+	array := [arraySize + 1]int{1, 1}
 
-	for index := 2; index <= max; index++ {
+	for index := 2; index <= arraySize; index++ {
 		generator := shared.PentGen()
 		var subtractor, toggle int
 		// index is the index into array[] which stores the results for each value up to max
@@ -33,8 +36,12 @@ func Challenge78() {
 			}
 			toggle++
 		}
-		array[index] %= 1_000_000
-		if array[index]%1_000_000 == 0 {
+		array[index] %= target
+		// The challenge is to find the lowest integer for which the total number of possible partitions
+		// is divisible by 1 million.  This means that we only need the first 6 digits and don't need to
+		// worry about of exceeding the possible size of a 64 bit int.  In this case the partition with
+		// size of 1 is valid.
+		if array[index]%target == 0 {
 			fmt.Printf("Challenge 78 solution is: %d\n", index)
 			return
 		}
