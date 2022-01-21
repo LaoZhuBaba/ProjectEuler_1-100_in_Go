@@ -16,14 +16,16 @@ const (
 type Cell struct {
 	val    int
 	lChild *Cell
+	lCost  int
 	rChild *Cell
+	rCost  int
 }
 
 // These are some data for testing.  If you want to use any of these
 // you will need to update the size constant above which reprents the
 // length of a row (or column) in the matrix.  And obviously change
 // the paramenter passed to descendTree() within Challenge81().
-//
+
 // var matrixValues = [sizeSquared]int{
 // 	131, 673, 234, 103, 18,
 // 	201, 96, 342, 965, 150,
@@ -50,7 +52,9 @@ type Cell struct {
 // 	3, 4,
 // }
 
-var matrix [sizeSquared]Cell
+type Matrix [sizeSquared]Cell
+
+var matrix Matrix
 
 // Load the data into an array of the correct size and return it
 func loadMatrixFile() [sizeSquared]int {
@@ -77,7 +81,7 @@ func loadMatrixFile() [sizeSquared]int {
 // These pointers to child cells allow us to move down or right within the matrix.
 // Depending on whether you think of the data as a matrix or a tree, "down" can
 // also be considered "left".
-func loadValues(matrix *[sizeSquared]Cell, matrixValues *[sizeSquared]int) {
+func loadValues(matrix *Matrix, matrixValues *[sizeSquared]int) {
 	for k, v := range *matrixValues {
 		matrix[k].val = v
 		if k%size != size-1 {
@@ -92,6 +96,100 @@ func loadValues(matrix *[sizeSquared]Cell, matrixValues *[sizeSquared]int) {
 			// Cells in the last row in the matrix have no left child.
 			matrix[k].lChild = nil
 		}
+	}
+}
+func dijkstraLoadValues(matrix *Matrix, matrixValues *[sizeSquared]int) {
+	for k, v := range *matrixValues {
+		if k == 0 {
+			matrix[k].val = 0
+		} else {
+			matrix[k].val = reallyBig
+		}
+		if k%size != size-1 {
+			matrix[k].rChild = &matrix[k+1]
+			matrix[k].rCost = v
+		} else {
+			// There is no right child for the last cell in each matrix row
+			matrix[k].rChild = nil
+		}
+		if k/size != size-1 {
+			matrix[k].lChild = &matrix[k+size]
+			matrix[k].lCost = v
+		} else {
+			// Cells in the last row in the matrix have no left child.
+			matrix[k].lChild = nil
+			// This is just to ensure we have somewhere to store the last value
+			matrix[k].lCost = v
+		}
+	}
+}
+
+func dijkstraGenerateNextCell(m *Matrix) func() *Cell {
+	count := 0
+	distance := 0
+	x := 0
+	y := 0
+
+	return func() *Cell {
+		var ret *Cell
+		if count >= size*size {
+			return nil
+		}
+		// This loop will only iterate once unless the x or y are out of bounds (i.e., have a value > size).
+		// This happens naturally because x & y are coordinates to points which are increasing distant.
+		// Once we reach the (x,y) coordinate matching (size,size) then all greater distances will out-of
+		// bounds.  This situation will be captured by the about check of count.
+		for {
+			if x < size && y < size {
+				ret = &matrix[y*size+x]
+			} else {
+				ret = nil
+			}
+			// Let x grow up to distance after which increment distance and reset
+			if x == distance {
+				x = 0
+				distance++
+				y = distance
+
+			} else {
+				y = distance - x - 1
+				x++
+			}
+			if ret == nil {
+				continue
+			}
+			count++
+			return ret
+		}
+	}
+}
+
+// An alternative solution using the Dijkstra algorithm.
+// This algorithm requires a cost for each path (rather than each cell).  So in this solution cell.val
+// records the cumulative total path cost and is initially set to reallyBig so that the first estimate
+// of cumulative total is always better (i.e., lower) than the initial value.  One catch is that because
+// we store the individual path costs in val.lCost and val.rCost it may seem like there is nowhere to
+// store this value for the terminal cell because it has no valid children.  To work around this for the
+// final row the dijkstraLoadValues() function stores this value in cell.lCost, even cell.lChild is nil.
+
+func dijkstra(generator func() *Cell) int {
+	var currentVal int
+	for {
+		cell := generator()
+		if cell == nil {
+			return currentVal
+		}
+		if cell.lChild != nil {
+			if cell.lChild.val > cell.val+cell.lCost {
+				cell.lChild.val = cell.val + cell.lCost
+			}
+		}
+		if cell.rChild != nil {
+			if cell.rChild.val > cell.val+cell.rCost {
+				cell.rChild.val = cell.val + cell.rCost
+			}
+		}
+		currentVal = cell.val + cell.lCost
 	}
 }
 
@@ -131,5 +229,9 @@ func descendTree(cell *Cell) int {
 func Challenge81() {
 	rawValues := loadMatrixFile()
 	loadValues(&matrix, &rawValues)
-	fmt.Printf("Challenge 81 solution: %d\n", descendTree(&matrix[0]))
+	//	loadValues(&matrix, &matrixValues)
+	fmt.Printf("Challenge 81 solution solved by recursion: %d\n", descendTree(&matrix[0]))
+	dijkstraLoadValues(&matrix, &rawValues)
+	generator := dijkstraGenerateNextCell(&matrix)
+	fmt.Printf("Challenge 81 solution solved by Dijkstra algorithm: %d\n", dijkstra(generator))
 }
