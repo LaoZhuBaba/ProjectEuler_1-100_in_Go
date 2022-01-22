@@ -14,7 +14,7 @@ const (
 
 type Cell struct {
 	distance int // The total calculated distance via the currently known best path.  Initialised to "reallyBig"
-	cost     int // The cost of links to child cells in this model, the value is common to all three links
+	cost     int // The cost of links to child cells. In this model, the value is common to all three links
 	uChild   *Cell
 	dChild   *Cell
 	rChild   *Cell
