@@ -1,6 +1,6 @@
 package main
 
-import "euler/challenge84"
+import "euler/challenge85"
 
 func main() {
 	// challenge1.Challenge1()
@@ -86,5 +86,6 @@ func main() {
 	// challenge81.Challenge81()
 	// challenge82.Challenge82()
 	// challenge83.Challenge83()
-	challenge84.Challenge84()
+	// challenge84.Challenge84()
+	challenge85.Challenge85()
 }
