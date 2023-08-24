@@ -1,9 +1,9 @@
-//go:build c90
+//go:build c
 
 package challenges
 
 import "euler/challenge90"
 
 func Challenge() {
-	challenge90.Challenge90()
+    challenge.Challenge()
 }

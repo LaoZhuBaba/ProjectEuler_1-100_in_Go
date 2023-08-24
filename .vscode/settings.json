@@ -1,4 +1,4 @@
 {
-    "go.buildTags": "challenge c90",
-    "go.testTags": "challenge c90"
+    "go.buildTags": "challenge c91",
+    "go.testTags": "challenge c91"
 }
