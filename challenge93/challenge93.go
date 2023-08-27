@@ -31,9 +31,6 @@ func nMemberSubsets(subsetSize, setSize int) (subsets [][]int) {
 }
 
 func nMemberSubsets2(subsetSize int, set []int) (subsets [][]int) {
-	// if n == len(set) {
-	// 	return [][]int{set}
-	// }
 	if subsetSize == 1 {
 		for _, memb := range set {
 			subsets = append(subsets, []int{memb})
@@ -48,91 +45,62 @@ func nMemberSubsets2(subsetSize int, set []int) (subsets [][]int) {
 		for _, tailSet := range nMemberSubsets2(subsetSize-1, oneLessSet) {
 			headSet = append(headSet, append([]int{member}, tailSet...))
 		}
-		// for _, tailSet := range setsWithinSet(tail) {
-		// 	headSet = append(headSet, append([]int{head}, tailSet...))
-		// }
-		// sets = append(sets, headSet...)
 		subsets = append(subsets, headSet...)
 	}
 	return subsets
 }
 
-// func permutationsWithRepeats(level int, set []rune, input []rune) (output [][]rune) {
-// 	if level == 2 {
-// 		return output
-// 	}
-
-//		var inputCopy []rune
-//		inputCopy = append(inputCopy, input...)
-//		for _, r := range set {
-//			output = append(output, inputCopy)
-//			output[len(output)-1][level] = r
-//			// fmt.Printf("%s%c\n", strings.Repeat(".", level), r)
-//		}
-//		return append(permutationsWithRepeats(level+1, set, output[len(output)-1]), output...)
-//	}
 func Challenge93() {
-	// var output [][]rune
-	// start := []rune{'0', '0', '0', '0'}
+	result := AllOrderedCombinations(4)
+	fmt.Printf("result: %v (length: %d)\n", result, len(result))
+}
 
-	// output = permutationsWithRepeats(
-	// 	0,
-	// 	[]rune{'0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f'},
-	// 	start,
-	// )
-	// fmt.Printf("%c\n", output)
-	const max = 4
-	subsets := setsWithinSet(max)
-	// for count := 1; count <= max; count++ {
-	// 	result := setsWithinSet(count)
-	// 	fmt.Printf("result: %v\n", result)
-	// 	fmt.Printf("count: %d, length %d\n", count, len(result))
-	// }
-	//subsets := []int{0, 1, 2, 3}
-	operators := []rune{'+', '-', '*', '/'}
-	fmt.Printf("subsets: %v\n", subsets)
-	all := [][][]int{}
+// AllOrderedCombinations returns all possible ways that a set of things can be
+// combined and repeated to make other sets of the same length.  For example,
+// AllOrderedCombinations(2) returns: [[0,0],[1,1],[0,1],[1,0]].
+func AllOrderedCombinations(max int) (result [][]int) {
+	// addends will be a list of all possible ordered addends of max.  E.g.,
+	// if max is 3 then addends will be [[3], [2,1], [1,2], [1,1,1]]
+	// For our purposes the above means that a set of three things could
+	// contain 3 things of the same type, 3 different things or 2 + 1 in
+	// two different orders.
+	addends := setsWithinSet(max)
+
+	// allSubsets will be a list of all possible ordered subsets.  E.g.,
+	// if max is 3 then all Subsets will be:
+	// [
+	//  [[0],[1],[2]],
+	//  [[0,1],[0,2],[1,0],[1,2],[2,0],[2,1]],
+	//  [[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]]
+	// ]
+	allSubsets := [][][]int{}
 	for count := 1; count <= max; count++ {
-		all = append(all, nMemberSubsets(count, max))
+		allSubsets = append(allSubsets, nMemberSubsets(count, max))
 	}
-	//result := [][]rune{}
-	fmt.Printf("all: %v\n", all)
 
-	var operatorSequence [][]rune
-	for _, repeaters := range subsets {
+	// We interpret each addend as a list of repeats.  For example [2,1] means we have
+	// a set of three things made up of two of one thing followed by one of another thing.
+	for _, repeaters := range addends {
+		// repeatersLength describes the number of different types of things, [2,1] applied to apples
+		// and pears means we have two apples and one pear, but still only two differnt types.
 		repeatersLength := len(repeaters)
-		fmt.Printf("repeaters: %v\n", repeaters)
-		fmt.Printf("repeatersLength: %d\n", repeatersLength)
-		selectors := all[repeatersLength-1]
-		fmt.Printf("selectors: %v\n", selectors)
+		// Index into allSubsets to get a list of the correct number of things.  E.g.,
+		// allSubsets[0] is a list of single things.
+		selectors := allSubsets[repeatersLength-1]
+		// selection is a single case of a subset of the right length.  For example
+		// allSubsets[1] will be a list of all possible sets of two things.  Each of these things
+		// might occur once or several times.  We use repeaters to get all the possible
+		// repetitions.
 		for _, selection := range selectors {
-			operations := []rune{}
-			for index, i := range selection {
-				operator := operators[i]
+			resultMember := []int{}
+			for index, value := range selection {
 				for count := 0; count < repeaters[index]; count++ {
-					operations = append(operations, operator)
+					// repeaters[index] is the number of times that value is appended resultMember
+					resultMember = append(resultMember, value)
 				}
 			}
-			operatorSequence = append(operatorSequence, operations)
+			result = append(result, resultMember)
 		}
-		// for index, repeater := range repeaters {
-		// 	for _, selected := range selectors[index] {
-
-		// 	}
-		// }
-		// for _, repeater := range repeaters {
-		// 	for count := 0; count < repeater; count++ {
-
-		// 	}
-		// }
-		// rowset := []rune{}
-		// for _, val := range subset {
-		// 	fmt.Printf("all[val-1]: %v\n", all[val-1])
-		// 	// for _, v := range all[val-1] {
-		// 	// 	rowset = append(rowset, operators[v])
-		// 	// }
-		// 	result = append(result, rowset)
-		// }
-		fmt.Printf("result: %c\n", operatorSequence)
 	}
+	return result
 }
