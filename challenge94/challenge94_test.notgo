@@ -1,0 +1,54 @@
+package challenge94
+
+import "testing"
+
+func Test_makeTriangleGt(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantPerimeter int
+	}{
+		{
+			name: "655",
+			args: args{
+				6,
+			},
+			wantPerimeter: 16,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotPerimeter := makeTriangleGt(tt.args.n); gotPerimeter != tt.wantPerimeter {
+				t.Errorf("makeTriangleGt() = %v, want %v", gotPerimeter, tt.wantPerimeter)
+			}
+		})
+	}
+}
+func Test_makeTriangleLt(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name          string
+		args          args
+		wantPerimeter int
+	}{
+		{
+			name: "655",
+			args: args{
+				6,
+			},
+			wantPerimeter: 16,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotPerimeter := makeTriangleLt(tt.args.n); gotPerimeter != tt.wantPerimeter {
+				t.Errorf("makeTriangleGt() = %v, want %v", gotPerimeter, tt.wantPerimeter)
+			}
+		})
+	}
+}
