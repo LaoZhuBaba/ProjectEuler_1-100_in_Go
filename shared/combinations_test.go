@@ -100,6 +100,14 @@ func TestNMemberSubsets(t *testing.T) {
 			wantSubsets: [][]int{{0, 1}, {0, 2}, {1, 0}, {1, 2}, {2, 0}, {2, 1}},
 		},
 		{
+			name: "subset 2 in set 5",
+			args: args{
+				subsetSize: 2,
+				setSize:    11,
+			},
+			wantSubsets: [][]int{{0, 1}, {0, 2}, {1, 0}, {1, 2}, {2, 0}, {2, 1}},
+		},
+		{
 			name: "subset 1 in set 3",
 			args: args{
 				subsetSize: 1,
