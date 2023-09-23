@@ -11,7 +11,7 @@ import (
 	"sort"
 )
 
-const sudokuFile = "0098_words.txt"
+const File = "0098_words.txt"
 
 type squarePair struct {
 	n       int
@@ -79,13 +79,13 @@ func countUniqueChars(s string) int {
 }
 
 func loadFile() (all []string) {
-	f, err := os.Open(sudokuFile)
+	f, err := os.Open(File)
 	if err != nil {
-		log.Fatalf("failed to open file: %s", sudokuFile)
+		log.Fatalf("failed to open file: %s", File)
 	}
 	all, err = csv.NewReader(f).Read()
 	if err != nil {
-		log.Fatalf("failed to read CSV file: %s", sudokuFile)
+		log.Fatalf("failed to read CSV file: %s", File)
 	}
 	return all
 }
