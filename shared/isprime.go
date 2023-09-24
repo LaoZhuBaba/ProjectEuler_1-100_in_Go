@@ -40,6 +40,23 @@ func GetPrimeFactors(n int) []int {
 	}
 	return append(factors, n)
 }
+
+func GetPrimeFactorsUint64(n uint64) []uint64 {
+	if n < 2 {
+		return []uint64{1}
+	}
+	factors := make([]uint64, 0)
+	var i uint64
+	for i = uint64(2); i < (uint64(math.Sqrt(float64(n))) + uint64(1)); i++ {
+		if n%i == 0 {
+			factors = append(factors, i)
+			n /= i
+			i--
+		}
+	}
+	return append(factors, n)
+}
+
 func GetPrimeFactorsNoDups(n int) []int {
 	if n < 2 {
 		return []int{1}

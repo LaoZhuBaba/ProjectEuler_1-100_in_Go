@@ -78,6 +78,20 @@ func Factorise(n int, list *[]int) {
 	}
 }
 
+func FactoriseUint64(n uint64, list *[]uint64) {
+	sr := uint64(math.Sqrt(float64(n)))
+	*list = append(*list, 1)
+	for c := uint64(2); c <= sr; c++ {
+		if n%c == 0 {
+			if c != n/c {
+				*list = append(*list, c, n/c)
+			} else {
+				*list = append(*list, c)
+			}
+		}
+	}
+}
+
 func SumOfList(l *[]int) int {
 	sum := 0
 	for _, n := range *l {

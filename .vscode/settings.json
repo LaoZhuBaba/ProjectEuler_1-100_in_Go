@@ -1,6 +1,6 @@
 {
-    "go.buildTags": "challenge c99",
-    "go.testTags": "challenge c99",
+    "go.buildTags": "challenge c100",
+    "go.testTags": "challenge c100",
     "[python]": {
         "editor.defaultFormatter": "ms-python.black-formatter"
     },
