@@ -6,31 +6,38 @@ import (
 	"lukechampine.com/uint128"
 )
 
-func intDiviedBySqRootOf2(n uint128.Uint128) uint128.Uint128 {
+func intDiviedBySqRootOf2(n uint64) uint64 {
 	// 1607521/1136689 is a fractional approximation of the square root of 2
-	return n.Mul64(1136689).Div64(1607521)
+	n128 := uint128.From64(n)
+	// Use uint128 to avoid losing significant bits during this calculation
+	return n128.Mul64(1136689).Div64(1607521).Lo
 }
 func Challenge100() {
 
 	const max uint64 = 10_000_000_000_000
-	var denom1, denom2, numer1, numer2 uint128.Uint128
+	var denom1, denom2, numer1, numer2 uint64
 	// Experimentation shows that each successive solution increases by a factor of approx 5.82
-	for denom1 = uint128.From64(2); denom1.Cmp64(max) == -1; denom1 = denom1.Mul64(582).Div64(100) {
-		for {
-			denom2 = denom1.Add64(1)
+	for denom1 = 2; denom1 < max; denom1 = denom1 * 582 / 100 {
+		for ; ; denom1++ {
+			// fmt.Printf("%d %d %d %d\n", numer1, denom1, numer2, denom2)
 			numer1 = intDiviedBySqRootOf2(denom1)
-			numer2 = numer1.Add64(1)
-			dd := denom1.Mul(denom2)
-			nn := numer1.Mul(numer2).Mul64(2)
-			if dd.Cmp(nn) == 0 {
+			// If numer1 is not even then no chance of a result.
+			if numer1%2 != 0 {
+				continue
+			}
+			denom2 = denom1 + 1
+			numer2 = numer1 + 1
+			dd := denom1 * denom2
+			nn := numer1 * numer2 * 2
+			if dd == nn {
 				// Detect if the solution is > 10^12
-				if denom2.Cmp64(999_999_999_999) == 1 {
-					fmt.Printf("challenge 100 solution is: %s\n", numer2.String())
+				fmt.Printf("%d / %d * %d / %d == 2\n", numer1, denom1, numer2, denom2)
+				if denom2 > 999_999_999_999 {
+					fmt.Printf("challenge 100 solution is: %d\n", numer2)
 					return
 				}
 				break
 			}
-			denom1 = denom1.Add64(1)
 		}
 	}
 }
